@@ -1,9 +1,19 @@
-import React from "react";
 import { Col, Row } from "react-bootstrap";
-import products from "../products";
 import Product from "../Components/Product";
+import { useGetProductsQuery } from "../slices/productSlice";
+import Loader from "../Components/Loader";
+import Message from "../Components/Message";
 
 const HomeScreen = () => {
+  const { data: products, isLoading, isError } = useGetProductsQuery();
+
+  if (isLoading) {
+    return <Loader />;
+  }
+  if (isError) {
+    return <Message variant="danger">Error Fetching Products List</Message>;
+  }
+
   return (
     <>
       <Row>

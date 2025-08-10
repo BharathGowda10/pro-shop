@@ -1,4 +1,3 @@
-import React from "react";
 import { Link, useParams } from "react-router-dom";
 import Rating from "../Components/Rating";
 import {
@@ -10,11 +9,24 @@ import {
   Button,
   Card,
 } from "react-bootstrap";
-import products from "../products";
+import { useGetProductDetailsQuery } from "../slices/productSlice";
+import Loader from "../Components/Loader";
+import Message from "../Components/Message";
 
 const ProductPage = () => {
   const { id: productId } = useParams();
-  const product = products.find((prod) => prod._id === productId);
+  const {
+    data: product,
+    isLoading,
+    isError,
+  } = useGetProductDetailsQuery(productId);
+
+  if (isLoading) {
+    return <Loader />;
+  }
+  if (isError) {
+    return <Message variant="danger">Error Fetching Products Details</Message>;
+  }
   return (
     <>
       <Link to="/">
