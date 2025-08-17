@@ -2,7 +2,7 @@
   "name": "proshop",
   "version": "1.0.0",
   "description": "a complete ecommerce app using mern stack",
-  "main": "server.js",
+  "main": "backend/server.js",
   "type": "module",
   "scripts": {
     "start": "node backend/server.js",
