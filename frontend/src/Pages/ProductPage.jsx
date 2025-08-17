@@ -8,18 +8,28 @@ import {
   ListGroupItem,
   Button,
   Card,
+  Form,
 } from "react-bootstrap";
 import { useGetProductDetailsQuery } from "../slices/productSlice";
 import Loader from "../Components/Loader";
 import Message from "../Components/Message";
+import { useDispatch } from "react-redux";
+import { addToCart } from "../slices/cartSlice";
+import { useState } from "react";
 
 const ProductPage = () => {
   const { id: productId } = useParams();
+  const [qty, setQty] = useState(1);
+  const dispatch = useDispatch();
   const {
     data: product,
     isLoading,
     isError,
   } = useGetProductDetailsQuery(productId);
+
+  const addToCartHandler = () => {
+    dispatch(addToCart({ ...product, qty }));
+  };
 
   if (isLoading) {
     return <Loader />;
@@ -82,13 +92,36 @@ const ProductPage = () => {
                 </Row>
               </ListGroupItem>
               <ListGroupItem>
-                <Button
-                  className="btn btn-block"
-                  disabled={product.countInStock === 0}
-                  type="button"
-                >
-                  Add to Cart
-                </Button>
+                <Row>
+                  <Col>
+                    <strong>Quantity: </strong>
+                  </Col>
+                  <Col>
+                    <Form.Control
+                      as="select"
+                      value={qty}
+                      onChange={(e) => setQty(Number(e.target.value))}
+                    >
+                      {[...Array(product.countInStock).keys()].map((x) => (
+                        <option key={x + 1} value={x + 1}>
+                          {x + 1}
+                        </option>
+                      ))}
+                    </Form.Control>
+                  </Col>
+                </Row>
+              </ListGroupItem>
+              <ListGroupItem>
+                <Link to="/cart">
+                  <Button
+                    className="btn btn-block"
+                    disabled={product.countInStock === 0}
+                    type="button"
+                    onClick={addToCartHandler}
+                  >
+                    Add to Cart
+                  </Button>
+                </Link>
               </ListGroupItem>
             </ListGroup>
           </Card>
