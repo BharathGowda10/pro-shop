@@ -90,3 +90,28 @@ export const updateOrderIsPaid = asyncHandler(async (req, res) => {
     throw new Error("Order not found");
   }
 });
+export const getAllOrders = asyncHandler(async (req, res) => {
+  const orders = await Order.find({}).populate("user", "name email");
+  if (orders) {
+    return res.status(200).json(orders);
+  } else {
+    res.status(404);
+    throw new Error("No Orders Found");
+  }
+});
+
+export const updateOrderIsDelivered = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (order) {
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+    const updateOrder = await order.save();
+    res.status(200).json({
+      message: "Order paid successfully",
+      updateOrder,
+    });
+  } else {
+    res.status(404);
+    throw new Error("Order not found");
+  }
+});

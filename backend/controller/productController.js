@@ -15,3 +15,22 @@ export const fetchSingleProduct = asyncHandler(async (req, res) => {
   res.status(404);
   throw new Error("Product not found");
 });
+
+export const createProduct = asyncHandler(async (req, res) => {
+  const product = new Products({
+    name: "Sample name",
+    price: 0,
+    user: req.user._id,
+    image: "/images/sample.jpg",
+    brand: "Sample brand",
+    category: "Sample category",
+    countInStock: 0,
+    numReviews: 0,
+    description: "Sample description",
+  });
+  const newProduct = await product.save();
+  res.status(201).json({
+    message: "Product Created Successfully",
+    newProduct,
+  });
+});

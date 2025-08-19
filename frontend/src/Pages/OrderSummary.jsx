@@ -1,10 +1,12 @@
 import {
   useGetOrderByIdQuery,
   useGetPaypalClienIdQuery,
+  useUpdateIsDeliveredMutation,
   useUpdateIsPaidMutation,
 } from "../slices/orderSlice";
 import { Link, useParams } from "react-router-dom";
 import Loader from "../Components/Loader";
+import ButtonLoader from "../Components/ButtonLoader";
 import Message from "../Components/Message";
 import {
   Row,
@@ -13,15 +15,19 @@ import {
   ListGroupItem,
   Image,
   Card,
+  Button,
+  Badge,
   // Button,
 } from "react-bootstrap";
 import { formatDateTime, getAddress } from "../utils/index";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { useSelector } from "react-redux";
 
 const OrderSummary = () => {
   const { id: orderId } = useParams();
+  const userInfo = useSelector((state) => state.auth.userInfo);
 
   const {
     data: orderItems,
@@ -30,6 +36,8 @@ const OrderSummary = () => {
     isError,
   } = useGetOrderByIdQuery(orderId);
   const [updateIsPaid, { isLoading: payLoading }] = useUpdateIsPaidMutation();
+  const [updateIsDelivered, { isLoading: deliveryLoading }] =
+    useUpdateIsDeliveredMutation();
   const {
     data: payPalId,
     isLoading: payPalLoading,
@@ -91,6 +99,16 @@ const OrderSummary = () => {
     toast.error(err.message);
   }
 
+  const deliverHandler = async () => {
+    try {
+      await updateIsDelivered(orderId);
+      refetch();
+      toast.success("Order delivered Successfully");
+    } catch (error) {
+      toast.error(error?.data?.message);
+    }
+  };
+
   if (isLoading) {
     return <Loader />;
   }
@@ -117,7 +135,7 @@ const OrderSummary = () => {
               </div>
               {orderItems?.order?.isDelivered ? (
                 <Message variant="success">
-                  Delivered on {orderItems?.order?.deliveredAt}
+                  Delivered on {formatDateTime(orderItems?.order?.deliveredAt)}
                 </Message>
               ) : (
                 <Message variant="danger">Not delivered</Message>
@@ -223,6 +241,25 @@ const OrderSummary = () => {
                     )}
                   </ListGroup.Item>
                 )}
+                <ListGroup.Item>
+                  {userInfo?.isAdmin &&
+                    orderItems?.order?.isPaid &&
+                    !orderItems?.order?.isDelivered && (
+                      <Button onClick={deliverHandler}>
+                        {deliveryLoading ? (
+                          <ButtonLoader />
+                        ) : (
+                          "Mark As Delivered"
+                        )}
+                      </Button>
+                    )}
+                </ListGroup.Item>
+                <ListGroupItem>
+                  {orderItems?.order?.isPaid &&
+                    orderItems?.order?.isDelivered && (
+                      <Badge pill className="p-2 fs-5 bg-success">Order Completed</Badge>
+                    )}
+                </ListGroupItem>
               </ListGroup>
             </Card.Body>
           </Card>

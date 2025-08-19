@@ -10,7 +10,10 @@ import OrderPage from "../Pages/OrderPage";
 import OrderSummary from "../Pages/OrderSummary";
 import ProfilePage from "../Pages/ProfilePage";
 import PrivateRoute from "../Components/PrivateRoute";
+import AdminRoute from "../Components/AdminRoute";
 import NotFoundPage from "../Components/NotFoundPage";
+import OrderListPage from "../Pages/admin/OrderListPage";
+import ProductListPage from "../Pages/admin/ProductListPage";
 
 const Routing = () => {
   return (
@@ -27,6 +30,10 @@ const Routing = () => {
           <Route path="/order" element={<OrderPage />} />
           <Route path="/order/:id" element={<OrderSummary />} />
           <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+        <Route path="" element={<AdminRoute />}>
+          <Route path="/admin/orders" element={<OrderListPage />} />
+          <Route path="/admin/products" element={<ProductListPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
